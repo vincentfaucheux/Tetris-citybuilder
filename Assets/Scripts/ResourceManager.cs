@@ -9,26 +9,36 @@ public class ResourceManager : Singleton<ResourceManager>
     [field: SerializeField]
     public int goldAmount { get; private set; } = 100;
     public int peopleAmount { get; private set; } = 0;
+    public int foodAmount { get; private set; } = 0;
     
 
     public event Action onGoldChange;
     public event Action onPeopleChange;
+    public event Action onFoodChange;
 
-    public void AddGold(int goldAmount)
+    public void AddGold(int amount)
     {
-        this.goldAmount += goldAmount;
+        goldAmount += amount;
         if (onGoldChange != null)
         {
             onGoldChange();
         }
     }
 
-    public void AddPeople(int peopleAmount)
+    public void AddPeople(int amount)
     {
-        this.peopleAmount+= peopleAmount;
-        if (onPeopleChange!= null)
+        peopleAmount += amount;
+        if (onPeopleChange != null)
         {
             onPeopleChange();
         }
     }
-}
+
+    public void AddFood(int amount)
+    {
+        foodAmount += amount;
+        if (onFoodChange != null)
+        {
+            onFoodChange();
+        }
+    }}
