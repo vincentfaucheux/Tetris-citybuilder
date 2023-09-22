@@ -41,4 +41,19 @@ public class ResourceManager : Singleton<ResourceManager>
         {
             onFoodChange();
         }
-    }}
+    }
+
+    public bool CanAfford(Cost cost)
+    {
+        return (cost.gold <= goldAmount && cost.food <= foodAmount && cost.people <= peopleAmount);
+    }
+
+    public void Substract(Cost cost)
+    {
+        AddGold(-cost.gold);
+        AddFood(-cost.food);
+        AddPeople(-cost.people);
+    }
+}
+
+

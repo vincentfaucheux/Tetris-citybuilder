@@ -6,16 +6,17 @@ using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 
 public class BlockGroup : MonoBehaviour
-{
-    public int cost = 10;
-    
-    MatrixCollider[] childColliders;
+{    
+    public MatrixCollider[] childColliders;
+    Block[] blockList;
+
     CollisionMatrix _matrix{ get => CollisionMatrix.instance; }
     Vector2Int _matrixPosition { get => CollisionMatrix.instance.GetMatrixPos(transform); }
 
     void Start()
     {
-        childColliders = GetComponentsInChildren<MatrixCollider>(true);
+        blockList = GetComponentsInChildren<Block>(true);
+        childColliders = blockList.Select(block => block.matrixCollider).ToArray();
     }
 
     public Vector2Int GetLowestPosition(int x)
@@ -33,9 +34,9 @@ public class BlockGroup : MonoBehaviour
 
     public bool IsValidPosition(Vector2Int basePosition)
     {
-        foreach (MatrixCollider childCollider in childColliders)
+        foreach (Block block in blockList)
         {
-            Vector2Int relativePosition = childCollider.matrixPosition - _matrixPosition;
+            Vector2Int relativePosition = block.matrixCollider.matrixPosition - _matrixPosition;
             Vector2Int positionToCheck = basePosition + relativePosition;
 
             if (!CollisionMatrix.instance.IsValidPosition(positionToCheck))
@@ -60,5 +61,13 @@ public class BlockGroup : MonoBehaviour
     {
         foreach(MatrixCollider childCollider in childColliders)
             childCollider.SynchronizePosition();
+    }
+
+    public Cost cost { get => blockList.Select(b => b.cost).Aggregate((x, y) => x + y); }
+
+    public void OnPlace()
+    {
+        foreach (Block block in blockList)
+            block.OnPlace();
     }
 }

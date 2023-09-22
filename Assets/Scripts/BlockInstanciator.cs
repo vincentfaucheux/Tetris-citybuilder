@@ -20,6 +20,9 @@ public class BlockInstanciator : MonoBehaviour
     {
         GameObject ghostObject = Instantiate(blockGroupPrefab, transform.position, Quaternion.identity, transform);
         blockGroup = ghostObject.GetComponent<BlockGroup>();
+
+        if (blockGroup == null)
+            Debug.LogError("No BlockGroup found!");
     }
 
     // Update is called once per frame
@@ -62,17 +65,22 @@ public class BlockInstanciator : MonoBehaviour
             }
         }
 
-        if (
-            Input.GetKeyDown(KeyCode.Space)
-            && ResourceManager.instance.goldAmount > blockGroup.cost
-            )
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            Vector2Int? spawnPos = GetSpawnPosition();
-            if (spawnPos == null) {
-                Debug.LogError("Max iteration reached");
-            } else {
-                Spawn((Vector2Int)spawnPos);
+            if (ResourceManager.instance.CanAfford(blockGroup.cost))
+            {
+                Vector2Int? spawnPos = GetSpawnPosition();
+                if (spawnPos == null)
+                {
+                    Debug.LogError("Max iteration reached");
+                }
+                else
+                {
+                    Spawn((Vector2Int)spawnPos);
+                }
             }
+            else
+                Debug.LogWarning("Not enough resources");
         }   
     }
 
@@ -80,8 +88,8 @@ public class BlockInstanciator : MonoBehaviour
     {
         Vector3 position = CollisionMatrix.instance.GetRealWorldPosition(_matrixPosition);
         Instantiate(blockGroupPrefab, position, transform.rotation);
-        ResourceManager.instance.AddGold(-blockGroup.cost);
-        Debug.LogError(blockGroup.cost);
+        ResourceManager.instance.Substract(blockGroup.cost);
+        blockGroup.OnPlace();
     }
 
     public Vector2Int? GetSpawnPosition()
@@ -96,4 +104,5 @@ public class BlockInstanciator : MonoBehaviour
         }
         return null;
     }
+
 }
